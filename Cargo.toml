@@ -1,0 +1,13 @@
+[package]
+name = "muslib"
+version = "0.1.0"
+description = "Rust library for music synthesis and processing, inspired by Essentia."
+license = "AGPL-3.0-or-later"
+authors = ["Wiktor W. <wykwit@disroot.org>"]
+repository = "https://gitlab.com/wykwit/muslib/"
+readme = "README.md"
+keywords = ["music"]
+categories = ["multimedia::audio"]
+edition = "2021"
+
+[dependencies]
