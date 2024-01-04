@@ -1,1 +1,0 @@
-Code for examples goes here and it can be run from `cargo`.
