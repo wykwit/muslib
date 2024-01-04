@@ -11,3 +11,5 @@ categories = ["multimedia::audio"]
 edition = "2021"
 
 [dependencies]
+hound = "3.5.1"
+symphonia = "0.5.3"
