@@ -4,9 +4,9 @@ Rust library for music synthesis and processing, inspired by [Essentia](https://
 
 It provides a few simple algorithms and utilities:
 
-  - tonal analysis with harmonic pitch class profile -- **HPCP**
-  - inverse fast Fourier transform -- **IFFT**
-  - short-time Fourier transform -- **STFT**
+  - (WIP) tonal analysis with harmonic pitch class profile -- **HPCP**
+  - (WIP) inverse fast Fourier transform -- **IFFT**
+  - (WIP) short-time Fourier transform -- **STFT**
   - simple **mixer** to create mono tracks
   - **synth**esizer for simple waveforms
 
@@ -15,29 +15,25 @@ It provides a few simple algorithms and utilities:
 You can download pre-built binaries from [the releases page](https://gitlab.com/wykwit/muslib/-/releases).
 Otherwise see [build](###build) instructions for more details.
 
-The crate should also be available through [crates.io](https://crates.io/).
+The Rust crate should be available through [crates.io](https://crates.io/).
+You can add it with a simple:
+```
+$ cargo add muslib
+```
+
+There should also be a Python package available on [pypi.org](https://pypi.org).
+You can install it with a simple:
+```
+$ pip install muslib
+```
 
 ## Usage
 
-This project provides a CLI tool for utilizing the library,
-but it's also possible to use it in your own Rust projects
+This project provides a Rust library that can be used in other Rust projects
 or from Python code with our [PyO3](https://pyo3.rs/) bindings.
 
-See [docs](###docs) for a more detailed documentation.
-
-### command line
-
-```
-$ muslib --help
-```
-
-### python
-
-```python
-import muslib
-
-[TODO: sample python code]
-```
+See [docs](###docs) for a more detailed documentation
+and [examples](###examples) to learn how you could use this project in your own code.
 
 ## Development
 
@@ -71,6 +67,24 @@ $ cargo test
 
 TODO: create build CI and link it here
 
+### examples
+
+You can run Rust examples from the `examples` directory with:
+```
+$ cargo run --example [name] [args]
+```
+
+You will also find Python examples there, including those comparing the usage of muslib and Essentia for simple tasks.
+
+Some test scripts and helpers that were often run by hand during development are also there.
+
+## alternatives
+
+Other interesting Rust projects for audio DSP:
+
+- [dasp](https://github.com/RustAudio/dasp)
+- [fundsp](https://github.com/SamiPerttu/fundsp)
+
 ## license
 
 In the same spirit as Essentia, this project is licensed under [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.en.html).
@@ -91,4 +105,3 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ```
-
