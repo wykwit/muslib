@@ -1,178 +1,114 @@
+use pyo3::{pyclass, pymethods};
 use std::f64::consts::PI;
 
-use super::{Algorithm, DataInfo, Var, Variable};
+use super::Algorithm;
 
-/// Synthesizer Algorithm
-pub struct Synthesizer<'a> {
-    // inputs
-    /// frequencies of consecutive tones expressed in Hz
-    pub freq: Var<Vec<f64>>,
-    /// durations of consecutive tones expressed in seconds
-    pub durations: Var<Vec<f64>>,
-
-    // outputs
-    /// raw 16-bit pcm values of synthesized data
-    pub pcm_data: Var<Vec<u16>>,
-
-    // params
-    /// sample rate, default: 44100
-    pub sample_rate: Var<usize>,
-    /// optional parameters for the tone envelope: [a, h, d, s, r]
-    pub envelope: Var<Vec<f64>>,
-    /// waveform type as a str, one of: {sin, sqr, saw}
-    pub waveform: Var<&'a str>,
+#[pyclass(get_all)]
+pub struct Synthesizer {
+    /// Input: frequencies of consecutive tones expressed in Hz
+    #[pyo3(set)]
+    pub freq: Vec<f64>,
+    /// Input: durations of consecutive tones expressed in seconds
+    #[pyo3(set)]
+    pub durations: Vec<f64>,
+    /// Output: raw 16-bit pcm values of synthesized data
+    pub pcm_data: Option<Vec<u16>>,
+    /// Param: sample rate (default: 44100)
+    #[pyo3(set)]
+    pub sample_rate: usize,
+    /// Param: optional parameters for the tone envelope [a, h, d, s, r]
+    #[pyo3(set)]
+    pub envelope: Vec<f64>,
+    /// Param: waveform type as a str, one of {sin, sqr, saw}
+    #[pyo3(set)]
+    pub waveform: String,
 }
 
-/// create a new instance of Synthesizer
-pub fn new<'a>() -> Synthesizer<'a> {
-    Synthesizer {
-        //inputs
-        freq: Var {
-            name: "freq".into(),
-            desc: "Frequencies of consecutive tones expressed in Hz.".into(),
-            value: None,
-            data_info: "list[float]".into(),
-        },
+#[pymethods]
+impl Synthesizer {
+    #[new]
+    #[pyo3(signature = (
+        sample_rate=44100,
+        envelope=None,
+        waveform="sin"
+    ))]
+    fn pynew(sample_rate: usize, envelope: Option<Vec<f64>>, waveform: &str) -> Self {
+        Synthesizer {
+            freq: Vec::new(),
+            durations: Vec::new(),
+            pcm_data: None,
+            sample_rate: sample_rate,
+            envelope: envelope.unwrap_or(Vec::new()),
+            waveform: waveform.into(),
+        }
+    }
 
-        durations: Var {
-            name: "durations".into(),
-            desc: "Durations of consecutive tones expressed in seconds.".into(),
-            value: None,
-            data_info: "list[float]".into(),
-        },
+    #[pyo3(signature = (freq=None, durations=None))]
+    /// Compute the Algorithm
+    ///
+    /// Inputs:
+    ///   - freq: list[float]
+    ///   - durations: list[float]
+    ///
+    /// Outputs:
+    ///   - pcm_data: list[int]
+    ///
+    /// See attribute docs for more details.
+    fn __call__(&mut self, freq: Option<Vec<f64>>, durations: Option<Vec<f64>>) -> Vec<u16> {
+        if let Some(arg) = freq {
+            self.freq = arg
+        }
+        if let Some(arg) = durations {
+            self.durations = arg
+        }
 
-        // outputs
-        pcm_data: Var {
-            name: "pcm_data".into(),
-            desc: "Raw 16-bit PCM values of synthesized data.".into(),
-            value: None,
-            data_info: "list[int]".into(),
-        },
+        self.compute();
 
-        // params
-        sample_rate: Var {
-            name: "sample_rate".into(),
-            desc: "".into(),
-            value: Some(44100),
-            data_info: "int".into(),
-        },
-
-        envelope: Var {
-            name: "envelope".into(),
-            desc: "Optional parameters for the tone envelope: [a, h, d, s, r].".into(),
-            value: None,
-            data_info: "list[float]".into(),
-        },
-
-        waveform: Var {
-            name: "waveform".into(),
-            desc: "Waveform type, one of: {sin, sqr, saw}.".into(),
-            value: Some("sin"),
-            data_info: "str".into(),
-        },
+        self.pcm_data.as_ref().unwrap().clone()
     }
 }
 
-impl Algorithm for Synthesizer<'_> {
-    fn name(&self) -> &str {
-        "Synthesizer"
-    }
-
-    fn desc(&self) -> &str {
-        "..."
-    }
-
-    fn input_names(&self) -> Vec<&str> {
-        vec!["freq", "durations"]
-    }
-
-    fn input_info(&self, key: &str) -> &DataInfo {
-        match key {
-            "freq" => self.freq.data_info(),
-            "durations" => self.durations.data_info(),
-            _ => "",
-        }
-    }
-
-    fn output_names(&self) -> Vec<&str> {
-        vec!["pcm_data"]
-    }
-
-    fn output_info(&self, key: &str) -> &DataInfo {
-        match key {
-            "freq" => self.freq.data_info(),
-            "durations" => self.durations.data_info(),
-            _ => "",
-        }
-    }
-
-    fn param_names(&self) -> Vec<&str> {
-        vec!["sample_rate", "envelope", "waveform"]
-    }
-
-    fn param_info(&self, key: &str) -> &DataInfo {
-        match key {
-            "sample_rate" => self.sample_rate.data_info(),
-            "envelope" => self.envelope.data_info(),
-            "waveform" => self.waveform.data_info(),
-            _ => "",
-        }
+impl Algorithm for Synthesizer {
+    fn new() -> Self {
+        Self::pynew(44100, None, "sin")
     }
 
     fn compute(&mut self) {
-        let w = match self.waveform.value() {
-            Some("sin") => Waveform::Sin,
-            Some("sqr") => Waveform::Square,
-            Some("saw") => Waveform::Sawtooth,
+        let w = match self.waveform.as_str() {
+            "sin" => Waveform::Sin,
+            "sqr" => Waveform::Square,
+            "saw" => Waveform::Sawtooth,
             _ => Waveform::Sin,
         };
 
-        let mut e: Option<Envelope> = None;
-        if let Some(v) = self.envelope.value() {
-            if v.len() == 5 {
-                e = Some(Envelope {
-                    a: v[0],
-                    h: v[1],
-                    d: v[2],
-                    s: v[3],
-                    r: v[4],
-                })
-            }
-        }
+        let e = if self.envelope.len() == 5 {
+            Some(Envelope {
+                a: self.envelope[0],
+                h: self.envelope[1],
+                d: self.envelope[2],
+                s: self.envelope[3],
+                r: self.envelope[4],
+            })
+        } else {
+            None
+        };
 
         let mut t = Wavetable {
-            generator: Generator::new(
-                0.0,
-                Some(self.sample_rate.value().unwrap_or(44100) as f64),
-                Some(w),
-            ),
+            generator: Generator::new(0.0, Some(self.sample_rate as f64), Some(w)),
             envelope: e,
             samples: None,
         };
 
-        let f = self
-            .freq
-            .value()
-            .as_ref()
-            .expect("Input 'freq' was not provided.");
-
-        let d = self
-            .durations
-            .value()
-            .as_ref()
-            .expect("Input 'durations' was not provided.");
-
-        let n = std::cmp::min(f.len(), d.len());
+        let n = std::cmp::min(self.freq.len(), self.durations.len());
 
         let mut r = t.time(0.0).u16();
-
         for i in 0..n {
-            t.generator.freq(f[i]);
-            let mut m = t.time(d[i]).u16();
+            t.generator.freq(self.freq[i]);
+            let mut m = t.time(self.durations[i]).u16();
             r.append(&mut m);
         }
 
-        self.pcm_data.update(Some(r));
+        self.pcm_data = Some(r);
     }
 }
 
