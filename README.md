@@ -13,7 +13,7 @@ It provides a few simple algorithms and utilities:
 ## Installation
 
 You can download pre-built binaries from [the releases page](https://gitlab.com/wykwit/muslib/-/releases).
-Otherwise see [build](###build) instructions for more details.
+Otherwise see [build](#build) instructions for more details.
 
 The Rust crate should be available through [crates.io](https://crates.io/).
 You can add it with a simple:
@@ -32,8 +32,8 @@ $ pip install muslib
 This project provides a Rust library that can be used in other Rust projects
 or from Python code with our [PyO3](https://pyo3.rs/) bindings.
 
-See [docs](###docs) for a more detailed documentation
-and [examples](###examples) to learn how you could use this project in your own code.
+See [docs](#docs) for a more detailed documentation
+and [examples](#examples) to learn how you could use this project in your own code.
 
 ## Development
 
@@ -44,6 +44,12 @@ The output will be in the `target/release` directory.
 
 ```
 $ cargo build --release
+```
+
+To compile a Python wheel use `maturin`.
+
+```
+$ maturin build
 ```
 
 All project dependencies are listed in the `Cargo.toml` file.
