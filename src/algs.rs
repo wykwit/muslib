@@ -4,3 +4,5 @@ pub mod hpcp;
 pub mod ifft;
 /// short-time Fourier transform
 pub mod stft;
+/// synthesizer for simple waveforms
+pub mod synth;
