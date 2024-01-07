@@ -179,7 +179,8 @@ impl<T: ConvertibleSample> Loader<T> {
         }
     }
 
-    fn apply_gain(&self, x: T) -> T { // TODO
+    fn apply_gain(&self, x: T) -> T {
+        // TODO
         x
     }
 
@@ -208,7 +209,7 @@ impl Writer {
                 sample_rate: 44100,
                 bits_per_sample: 16,
                 sample_format: hound::SampleFormat::Int,
-            }
+            },
         }
     }
 
