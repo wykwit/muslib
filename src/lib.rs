@@ -16,3 +16,6 @@
 pub mod algs;
 /// simple mixer to load and create mono tracks
 pub mod mixer;
+
+// muslib python module
+mod pymod;
