@@ -15,13 +15,13 @@ It provides a few simple algorithms and utilities:
 You can download pre-built binaries from [the releases page](https://gitlab.com/wykwit/muslib/-/releases).
 Otherwise see [build](#build) instructions for more details.
 
-The Rust crate should be available through [crates.io](https://crates.io/).
+The Rust crate is available through [crates.io](https://crates.io/crates/muslib).
 You can add it with a simple:
 ```
 $ cargo add muslib
 ```
 
-There should also be a Python package available on [pypi.org](https://pypi.org).
+There is also a Python package available on [pypi.org](https://pypi.org/project/muslib/).
 You can install it with a simple:
 ```
 $ pip install muslib
@@ -63,7 +63,7 @@ The output will be in the `target/doc` directory.
 $ cargo doc
 ```
 
-The documentation should also be available through [docs.rs](https://docs.rs/).
+The documentation should also be available through [docs.rs](https://docs.rs/muslib/latest/muslib/).
 
 ### tests
 
