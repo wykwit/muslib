@@ -10,6 +10,11 @@ keywords = ["music"]
 categories = ["multimedia::audio"]
 edition = "2021"
 
+[lib]
+name = "muslib"
+crate-type = ["lib", "cdylib"]
+
 [dependencies]
 hound = "3.5.1"
+pyo3 = { version = "0.20.2", features = ["abi3-py311", "extension-module"] }
 symphonia = "0.5.3"
