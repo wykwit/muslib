@@ -1,4 +1,3 @@
-import essentia
 import essentia.standard
 
 loader = essentia.standard.MonoLoader(filename="sine.wav")
