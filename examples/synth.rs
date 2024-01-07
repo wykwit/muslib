@@ -1,34 +1,21 @@
-use muslib::algs::synth;
+use muslib::algs::{synth, Algorithm, Variable};
 use muslib::mixer::Writer;
 
 fn main() {
-    let mut g = synth::Wavetable {
-        generator: synth::Generator::new(440.0, None, Some(synth::Waveform::Sin)),
-        envelope: Some(synth::Envelope {
-            a: 0.1,
-            h: 0.02,
-            d: 0.2,
-            s: 0.6,
-            r: 0.1,
-        }),
-        samples: None,
-    };
+    let mut s = synth::new();
 
-    // we start with A_4 at 440Hz
-    let mut out = g.time(0.8).u16();
+    // params
+    s.envelope.update(Some(vec![0.1, 0.02, 0.2, 0.6, 0.1]));
 
-    g.generator.freq(880.0); // A_5
-    let mut t = g.time(0.7).u16();
-    out.append(&mut t);
+    // input
+    s.freq.update(Some(vec![440.0, 880.0, 660.0, 0.0])); // A_4, A_5, E_5, silence
+    s.durations.update(Some(vec![0.8, 0.7, 1.0, 0.5]));
+    s.compute();
 
-    g.generator.freq(660.0); // E_5
-    let mut t = g.time(1.0).u16();
-    out.append(&mut t);
+    // output
+    let out = s.pcm_data.value().as_ref().unwrap();
 
-    g.generator.freq(0.0); // silence
-    let mut t = g.time(1.0).u16();
-    out.append(&mut t);
-
+    // save
     let mut w = Writer::new();
     w.file("test.wav".into())
         .sample_rate(44100)

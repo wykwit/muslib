@@ -1,5 +1,181 @@
 use std::f64::consts::PI;
 
+use super::{Algorithm, DataInfo, Var, Variable};
+
+/// Synthesizer Algorithm
+pub struct Synthesizer<'a> {
+    // inputs
+    /// frequencies of consecutive tones expressed in Hz
+    pub freq: Var<Vec<f64>>,
+    /// durations of consecutive tones expressed in seconds
+    pub durations: Var<Vec<f64>>,
+
+    // outputs
+    /// raw 16-bit pcm values of synthesized data
+    pub pcm_data: Var<Vec<u16>>,
+
+    // params
+    /// sample rate, default: 44100
+    pub sample_rate: Var<usize>,
+    /// optional parameters for the tone envelope: [a, h, d, s, r]
+    pub envelope: Var<Vec<f64>>,
+    /// waveform type as a str, one of: {sin, sqr, saw}
+    pub waveform: Var<&'a str>,
+}
+
+/// create a new instance of Synthesizer
+pub fn new<'a>() -> Synthesizer<'a> {
+    Synthesizer {
+        //inputs
+        freq: Var {
+            name: "freq".into(),
+            desc: "Frequencies of consecutive tones expressed in Hz.".into(),
+            value: None,
+            data_info: "list[float]".into(),
+        },
+
+        durations: Var {
+            name: "durations".into(),
+            desc: "Durations of consecutive tones expressed in seconds.".into(),
+            value: None,
+            data_info: "list[float]".into(),
+        },
+
+        // outputs
+        pcm_data: Var {
+            name: "pcm_data".into(),
+            desc: "Raw 16-bit PCM values of synthesized data.".into(),
+            value: None,
+            data_info: "list[int]".into(),
+        },
+
+        // params
+        sample_rate: Var {
+            name: "sample_rate".into(),
+            desc: "".into(),
+            value: Some(44100),
+            data_info: "int".into(),
+        },
+
+        envelope: Var {
+            name: "envelope".into(),
+            desc: "Optional parameters for the tone envelope: [a, h, d, s, r].".into(),
+            value: None,
+            data_info: "list[float]".into(),
+        },
+
+        waveform: Var {
+            name: "waveform".into(),
+            desc: "Waveform type, one of: {sin, sqr, saw}.".into(),
+            value: Some("sin"),
+            data_info: "str".into(),
+        },
+    }
+}
+
+impl Algorithm for Synthesizer<'_> {
+    fn name(&self) -> &str {
+        "Synthesizer"
+    }
+
+    fn desc(&self) -> &str {
+        "..."
+    }
+
+    fn input_names(&self) -> Vec<&str> {
+        vec!["freq", "durations"]
+    }
+
+    fn input_info(&self, key: &str) -> &DataInfo {
+        match key {
+            "freq" => self.freq.data_info(),
+            "durations" => self.durations.data_info(),
+            _ => "",
+        }
+    }
+
+    fn output_names(&self) -> Vec<&str> {
+        vec!["pcm_data"]
+    }
+
+    fn output_info(&self, key: &str) -> &DataInfo {
+        match key {
+            "freq" => self.freq.data_info(),
+            "durations" => self.durations.data_info(),
+            _ => "",
+        }
+    }
+
+    fn param_names(&self) -> Vec<&str> {
+        vec!["sample_rate", "envelope", "waveform"]
+    }
+
+    fn param_info(&self, key: &str) -> &DataInfo {
+        match key {
+            "sample_rate" => self.sample_rate.data_info(),
+            "envelope" => self.envelope.data_info(),
+            "waveform" => self.waveform.data_info(),
+            _ => "",
+        }
+    }
+
+    fn compute(&mut self) {
+        let w = match self.waveform.value() {
+            Some("sin") => Waveform::Sin,
+            Some("sqr") => Waveform::Square,
+            Some("saw") => Waveform::Sawtooth,
+            _ => Waveform::Sin,
+        };
+
+        let mut e: Option<Envelope> = None;
+        if let Some(v) = self.envelope.value() {
+            if v.len() == 5 {
+                e = Some(Envelope {
+                    a: v[0],
+                    h: v[1],
+                    d: v[2],
+                    s: v[3],
+                    r: v[4],
+                })
+            }
+        }
+
+        let mut t = Wavetable {
+            generator: Generator::new(
+                0.0,
+                Some(self.sample_rate.value().unwrap_or(44100) as f64),
+                Some(w),
+            ),
+            envelope: e,
+            samples: None,
+        };
+
+        let f = self
+            .freq
+            .value()
+            .as_ref()
+            .expect("Input 'freq' was not provided.");
+
+        let d = self
+            .durations
+            .value()
+            .as_ref()
+            .expect("Input 'durations' was not provided.");
+
+        let n = std::cmp::min(f.len(), d.len());
+
+        let mut r = t.time(0.0).u16();
+
+        for i in 0..n {
+            t.generator.freq(f[i]);
+            let mut m = t.time(d[i]).u16();
+            r.append(&mut m);
+        }
+
+        self.pcm_data.update(Some(r));
+    }
+}
+
 /// waveforms supported by the tone generator
 pub enum Waveform {
     /// sinusoidal wave
@@ -172,8 +348,6 @@ impl Wavetable {
         output
     }
 }
-
-// TODO: Algorithm trait implementation
 
 #[cfg(test)]
 mod tests {
