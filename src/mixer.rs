@@ -112,10 +112,14 @@ impl<T: ConvertibleSample> Loader<T> {
         loop {
             let packet = match format.next_packet() {
                 Ok(packet) => packet,
+                // finished reading the file
                 Err(Error::ResetRequired) => {
-                    // finished reading the file
                     return Ok(self);
                 }
+                Err(Error::DecodeError(_)) | Err(Error::IoError(_)) => {
+                    return Ok(self);
+                }
+                // real errors
                 Err(err) => {
                     return Err(err);
                 }
@@ -187,6 +191,11 @@ impl<T: ConvertibleSample> Loader<T> {
     /// read the loaded pcm data as a vector
     pub fn data(&self) -> Vec<T> {
         self.data.clone()
+    }
+
+    /// read the loaded sample rate
+    pub fn sample_rate(&self) -> Option<u32> {
+        self.sample_rate
     }
 }
 
