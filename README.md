@@ -4,9 +4,9 @@ Rust library for music synthesis and processing, inspired by [Essentia](https://
 
 It provides a few simple algorithms and utilities:
 
-  - (WIP) tonal analysis with harmonic pitch class profile -- **HPCP**
-  - (WIP) inverse fast Fourier transform -- **IFFT**
-  - (WIP) short-time Fourier transform -- **STFT**
+  - tonal analysis with harmonic pitch class profile -- **HPCP**
+  - inverse fast Fourier transform -- **IFFT**
+  - short-time Fourier transform -- **STFT**
   - simple **mixer** to create mono tracks
   - **synth**esizer for simple waveforms
 
