@@ -1,6 +1,6 @@
 [package]
 name = "muslib"
-version = "0.1.0"
+version = "0.1.1"
 description = "Rust library for music synthesis and processing, inspired by Essentia."
 license = "AGPL-3.0-or-later"
 authors = ["Wiktor W. <wykwit@disroot.org>"]
