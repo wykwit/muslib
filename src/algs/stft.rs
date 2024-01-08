@@ -72,9 +72,9 @@ impl Algorithm for FFT {
 #[pyclass(get_all)]
 pub struct IFFT {
     /// Input: list[tuple[float, float]] -- fft data, max len 65535
+    #[pyo3(set)]
     pub fft_data: Vec<(f64, f64)>,
     /// Output: list[float] -- the IFFT of the input frame
-    #[pyo3(set)]
     pub frame: Vec<f32>,
 }
 
