@@ -12,4 +12,3 @@ if len(d1) != len(d2):
 for i in range(len(d1)):
     if d1[i] != d2[i]:
         print(i, d1[i], d2[i])
-
