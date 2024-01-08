@@ -6,21 +6,21 @@ use super::Algorithm;
 
 #[pyclass(get_all)]
 pub struct Synthesizer {
-    /// Input: frequencies of consecutive tones expressed in Hz
+    /// Input: list[float] -- frequencies of consecutive tones expressed in Hz
     #[pyo3(set)]
     pub freq: Vec<f64>,
-    /// Input: durations of consecutive tones expressed in seconds
+    /// Input: list[float] -- durations of consecutive tones expressed in seconds
     #[pyo3(set)]
     pub durations: Vec<f64>,
-    /// Output: raw 16-bit pcm values of synthesized data
+    /// Output: Optional[list[int]] -- raw 16-bit pcm values of synthesized data
     pub pcm_data: Option<Vec<u16>>,
-    /// Param: sample rate (default: 44100)
+    /// Param: int -- sample rate (default: 44100)
     #[pyo3(set)]
     pub sample_rate: usize,
-    /// Param: optional parameters for the tone envelope [a, h, d, s, r]
+    /// Param: list[float] -- optional parameters for the tone envelope [a, h, d, s, r]
     #[pyo3(set)]
     pub envelope: Vec<f64>,
-    /// Param: waveform type as a str, one of {sin, sqr, saw}
+    /// Param: str -- waveform type as a str, one of {sin, sqr, saw}
     #[pyo3(set)]
     pub waveform: String,
 }

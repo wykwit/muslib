@@ -5,12 +5,12 @@ use crate::mixer::{Loader, Writer};
 
 #[pyclass(get_all)]
 pub struct MonoLoader {
-    /// Input: path to a file that will be loaded
+    /// Input: str -- path to a file that will be loaded
     #[pyo3(set)]
     pub file: String,
-    /// Output: raw 16-bit pcm values of loaded data
+    /// Output: Optional[list[int]] -- raw 16-bit pcm values of loaded data
     pub pcm_data: Option<Vec<u16>>,
-    /// Output: sample rate
+    /// Output: int -- sample rate
     pub sample_rate: usize,
 }
 
@@ -69,12 +69,12 @@ impl Algorithm for MonoLoader {
 
 #[pyclass(get_all)]
 pub struct MonoWriter {
-    /// Input: path to a file that will be written
+    /// Input: str -- path to a file that will be written
     #[pyo3(set)]
     pub file: String,
-    /// Input: raw 16-bit pcm values of data to be written
+    /// Input: list[int] -- raw 16-bit pcm values of data to be written
     pub pcm_data: Vec<u16>,
-    /// Param: sample rate
+    /// Param: int -- sample rate
     #[pyo3(set)]
     pub sample_rate: usize,
 }
