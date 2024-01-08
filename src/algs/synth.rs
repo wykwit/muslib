@@ -1,5 +1,3 @@
-use std::f64::consts::PI;
-
 use pyo3::{pyclass, pymethods};
 
 use super::Algorithm;
@@ -164,7 +162,7 @@ impl Generator {
 
     /// amplitude value of the sinusoidal wave tone for a sample x
     fn sin(&self, x: f64) -> f64 {
-        let x: f64 = PI * 2.0 * x * self.freq / self.sample_rate;
+        let x: f64 = (std::f64::consts::PI) * 2.0 * x * self.freq / self.sample_rate;
         x.sin()
     }
 
