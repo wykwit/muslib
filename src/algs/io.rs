@@ -1,6 +1,7 @@
+use pyo3::{pyclass, pymethods};
+
 use super::Algorithm;
 use crate::mixer::{Loader, Writer};
-use pyo3::{pyclass, pymethods};
 
 #[pyclass(get_all)]
 pub struct MonoLoader {
@@ -24,7 +25,6 @@ impl MonoLoader {
         }
     }
 
-    #[pyo3(signature = (file=None))]
     /// Compute the Algorithm
     ///
     /// Inputs:
@@ -34,8 +34,9 @@ impl MonoLoader {
     ///   - pcm_data: list[int]
     ///   - sample_rate: int
     ///
-    /// See attribute docs for more details.
-    fn __call__(&mut self, file: Option<String>) -> (Vec<u16>, usize) {
+    /// See data descriptors for more details.
+    #[pyo3(name = "compute", signature = (file=None))]
+    fn pycompute(&mut self, file: Option<String>) -> (Vec<u16>, usize) {
         if let Some(arg) = file {
             self.file = arg
         }
@@ -43,6 +44,10 @@ impl MonoLoader {
         self.compute();
 
         (self.pcm_data.as_ref().unwrap().clone(), self.sample_rate)
+    }
+
+    fn __call__(&mut self) {
+        self.compute()
     }
 }
 
@@ -53,7 +58,9 @@ impl Algorithm for MonoLoader {
 
     fn compute(&mut self) {
         let mut loader = Loader::<u16>::new();
-        loader.file(self.file.clone().into()).load()
+        loader
+            .file(self.file.clone().into())
+            .load()
             .expect("Load failed");
         self.pcm_data = Some(loader.data());
         self.sample_rate = loader.sample_rate().unwrap() as usize;
@@ -86,15 +93,15 @@ impl MonoWriter {
         }
     }
 
-    #[pyo3(signature = (file=None, pcm_data=None))]
     /// Compute the Algorithm
     ///
     /// Inputs:
     ///   - file: str
     ///   - pcm_data: list[int]
     ///
-    /// See attribute docs for more details.
-    fn __call__(&mut self, file: Option<String>, pcm_data: Option<Vec<u16>>) {
+    /// See data descriptors for more details.
+    #[pyo3(name = "compute", signature = (file=None, pcm_data=None))]
+    fn pycompute(&mut self, file: Option<String>, pcm_data: Option<Vec<u16>>) {
         if let Some(arg) = file {
             self.file = arg
         }
@@ -103,6 +110,10 @@ impl MonoWriter {
         }
 
         self.compute();
+    }
+
+    fn __call__(&mut self) {
+        self.compute()
     }
 }
 

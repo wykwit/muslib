@@ -1,5 +1,6 @@
-use pyo3::{pyclass, pymethods};
 use std::f64::consts::PI;
+
+use pyo3::{pyclass, pymethods};
 
 use super::Algorithm;
 
@@ -43,7 +44,6 @@ impl Synthesizer {
         }
     }
 
-    #[pyo3(signature = (freq=None, durations=None))]
     /// Compute the Algorithm
     ///
     /// Inputs:
@@ -53,8 +53,9 @@ impl Synthesizer {
     /// Outputs:
     ///   - pcm_data: list[int]
     ///
-    /// See attribute docs for more details.
-    fn __call__(&mut self, freq: Option<Vec<f64>>, durations: Option<Vec<f64>>) -> Vec<u16> {
+    /// See data descriptors for more details.
+    #[pyo3(name = "compute", signature = (freq=None, durations=None))]
+    fn pycompute(&mut self, freq: Option<Vec<f64>>, durations: Option<Vec<f64>>) -> Vec<u16> {
         if let Some(arg) = freq {
             self.freq = arg
         }
@@ -65,6 +66,10 @@ impl Synthesizer {
         self.compute();
 
         self.pcm_data.as_ref().unwrap().clone()
+    }
+
+    fn __call__(&mut self) {
+        self.compute()
     }
 }
 
