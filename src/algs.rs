@@ -1,10 +1,8 @@
 /// harmonic pitch class profile
 pub mod hpcp;
-/// inverse fast Fourier transform
-pub mod ifft;
 /// input and output with wav files
 pub mod io;
-/// short-time Fourier transform
+/// short-time Fourier transform: FFT and IFFT
 pub mod stft;
 /// synthesizer for simple waveforms
 pub mod synth;

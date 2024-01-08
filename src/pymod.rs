@@ -7,6 +7,8 @@ use crate::algs::*;
 fn muslib(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<io::MonoLoader>()?;
     m.add_class::<io::MonoWriter>()?;
+    m.add_class::<stft::FFT>()?;
+    m.add_class::<stft::IFFT>()?;
     m.add_class::<synth::Synthesizer>()?;
     Ok(())
 }
