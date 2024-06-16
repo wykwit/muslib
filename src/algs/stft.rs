@@ -1,6 +1,6 @@
 use pyo3::{pyclass, pymethods};
-
-use symphonia::core::dsp::{complex::Complex, fft::Fft};
+use symphonia::core::dsp::complex::Complex;
+use symphonia::core::dsp::fft::Fft;
 
 use super::Algorithm;
 
@@ -53,18 +53,18 @@ impl Algorithm for FFT {
         // contruct a buffer of complex numbers
         let mut buf: [Complex; Fft::MAX_SIZE] = [Complex { re: 0.0, im: 0.0 }; Fft::MAX_SIZE];
         let n = std::cmp::min(self.frame.len(), Fft::MAX_SIZE);
-        let mut buf = &mut buf[0..n];
+        let buf = &mut buf[0..n];
         for i in 0..n {
             buf[i].re = self.frame[i] as f32;
         }
 
         let fft = Fft::new(n);
-        fft.fft_inplace(&mut buf);
+        fft.fft_inplace(buf);
 
         // convert and store the buffer as output
         self.fft_data = Vec::with_capacity(n);
-        for i in 0..n {
-            self.fft_data.push((buf[i].re, buf[i].im))
+        for x in buf.iter().take(n) {
+            self.fft_data.push((x.re, x.im))
         }
     }
 }
@@ -118,19 +118,19 @@ impl Algorithm for IFFT {
         // contruct a buffer of complex numbers
         let mut buf: [Complex; Fft::MAX_SIZE] = [Complex { re: 0.0, im: 0.0 }; Fft::MAX_SIZE];
         let n = std::cmp::min(self.fft_data.len(), Fft::MAX_SIZE);
-        let mut buf = &mut buf[0..n];
+        let buf = &mut buf[0..n];
         for i in 0..n {
             buf[i].re = self.fft_data[i].0 as f32;
             buf[i].im = self.fft_data[i].1 as f32;
         }
 
         let fft = Fft::new(n);
-        fft.ifft_inplace(&mut buf);
+        fft.ifft_inplace(buf);
 
         // convert and store the buffer as output
         self.frame = Vec::with_capacity(n);
-        for i in 0..n {
-            self.frame.push(buf[i].re)
+        for x in buf.iter().take(n) {
+            self.frame.push(x.re)
         }
     }
 }

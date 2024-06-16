@@ -195,17 +195,17 @@ impl HPCP {
                 m = x;
             }
         }
-        return m;
+        m
     }
 
     fn normalize(target: &mut Vec<f64>) {
-        let m = Self::maxvf(&target);
+        let m = Self::maxvf(target);
         if m == 0.0 {
             return;
         }
 
         for i in 0..target.len() {
-            target[i] = target[i] / m;
+            target[i] /= m;
         }
     }
 
@@ -264,7 +264,7 @@ impl HPCP {
         }
     }
 
-    fn add_contribution(&self, freq: f64, mag: f64, target: &mut Vec<f64>) {
+    fn add_contribution(&self, freq: f64, mag: f64, target: &mut [f64]) {
         for harmonic in &self.harmonic_peaks {
             let f = freq * (2.0_f64).powf(-harmonic.0 / 12.0);
             let w = harmonic.1;

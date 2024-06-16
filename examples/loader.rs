@@ -1,5 +1,6 @@
-use muslib::mixer::Loader;
 use std::env::args;
+
+use muslib::mixer::Loader;
 
 fn main() {
     let f = args().last().unwrap();

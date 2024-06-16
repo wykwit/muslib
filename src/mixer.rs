@@ -2,7 +2,6 @@ use std::fs::File;
 use std::path::PathBuf;
 
 use hound::{WavSpec, WavWriter};
-
 use symphonia::core::audio::{AudioBuffer, Signal};
 use symphonia::core::codecs::{DecoderOptions, CODEC_TYPE_NULL};
 use symphonia::core::conv::ConvertibleSample;
@@ -30,6 +29,12 @@ pub struct Loader<T> {
     track: Option<usize>,
     sample_rate: Option<u32>,
     data: Vec<T>,
+}
+
+impl<T: ConvertibleSample> Default for Loader<T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T: ConvertibleSample> Loader<T> {
@@ -71,8 +76,7 @@ impl<T: ConvertibleSample> Loader<T> {
 
     /// execute the Loader to load and mix the data
     pub fn load(&mut self) -> Result<&Self, Error> {
-        let file = File::open(self.file_path.to_owned())
-            .expect("Could not open file path for this Loader.");
+        let file = File::open(&self.file_path).expect("Could not open file path for this Loader.");
 
         let mut hint = Hint::new();
         if let Some(ext) = self.file_path.extension() {
@@ -154,8 +158,8 @@ impl<T: ConvertibleSample> Loader<T> {
                     let mut buf = Vec::<T>::with_capacity(len);
                     let channel = data.chan(self.channel.unwrap_or(0));
 
-                    for i in 0..len {
-                        buf.push(self.apply_gain(channel[i]));
+                    for ch in channel.iter().take(len) {
+                        buf.push(self.apply_gain(*ch));
                     }
 
                     if self.channel.is_none() {
@@ -208,6 +212,12 @@ pub struct Writer {
     spec: WavSpec,
 }
 
+impl Default for Writer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Writer {
     /// creates a new Writer instance with empty or default values
     pub fn new() -> Self {
@@ -235,8 +245,8 @@ impl Writer {
     }
 
     /// execute the Writer to store data in a file
-    pub fn write(&self, data: &Vec<u16>) -> Result<(), ()> {
-        let mut writer = WavWriter::create(self.file_path.to_owned(), self.spec)
+    pub fn write(&self, data: &[u16]) -> Result<(), ()> {
+        let mut writer = WavWriter::create(&self.file_path, self.spec)
             .expect("Failed to create a file for the Writer.");
 
         for t in data.iter() {
@@ -246,6 +256,6 @@ impl Writer {
                 .expect("Failed to write an output sample.");
         }
 
-        return Ok(());
+        Ok(())
     }
 }

@@ -36,8 +36,8 @@ impl Synthesizer {
             freq: Vec::new(),
             durations: Vec::new(),
             pcm_data: None,
-            sample_rate: sample_rate,
-            envelope: envelope.unwrap_or(Vec::new()),
+            sample_rate,
+            envelope: envelope.unwrap_or_default(),
             waveform: waveform.into(),
         }
     }
@@ -245,7 +245,7 @@ impl Envelope {
             return self.s - (x as f64) * (self.s) / (r as f64);
         }
 
-        return self.s;
+        self.s
     }
 }
 
